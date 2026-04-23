@@ -102,16 +102,37 @@ app.get('/instruments/:key', async function (request, response) {
   response.render('informatie.liquid',  { instrument, menuClass: 'overzicht' });
 });
 
-// admin routes 
+// admin login routes 
 app.get('/admin/login', function (request, response) {
   response.render('admin-login.liquid', { title: 'Admin Login', menuClass: 'portal' });
 });
 
-app.post('/', async function (request, response) {
-  // Je zou hier data kunnen opslaan, of veranderen, of wat je maar wilt
-  // Er is nog geen afhandeling van een POST, dus stuur de bezoeker terug naar /
-  response.redirect(303, '/')
-})
+app.post('/admin/login', function (request, response) {
+  const password = request.body.password;
+  const correctPassword = process.env.TEACHER_PASSWORD;
+
+  if (!correctPassword) {
+    return response.render('admin-login.liquid', { 
+      error: 'Serverconfiguratie fout: wachtwoord niet ingesteld',
+      title: 'Admin Login',
+      menuClass: 'portal'
+    });
+  }
+
+  if (password === correctPassword) {
+    const sessionId = Math.random().toString(36).substring(2, 15);
+    sessions.set(sessionId, { adminAuthenticated: true, createdAt: Date.now() });
+    // Set session and cookies
+    response.setHeader('Set-Cookie', `sessionId=${sessionId}; Max-Age=3600; Path=/; HttpOnly`);
+    response.redirect(303, '/admin/panel');
+  } else {
+    response.render('admin-login.liquid', { 
+      error: 'Onjuist wachtwoord',
+      title: 'Admin Login',
+      menuClass: 'portal'
+    });
+  }
+});
 
 app.use(function (request, response) {
   response.status(404).render('404.liquid')
