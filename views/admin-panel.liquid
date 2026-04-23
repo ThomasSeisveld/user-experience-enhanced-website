@@ -17,36 +17,48 @@
   </header>
 
   <section class="admin-content">
-    <article class="scanner-entry">
-      <h2>QR-code Scanner</h2>
-    </article>
+    {% comment %}
+      <article class="scanner-entry">
+        <h2>QR-code Scanner</h2>
+      </article>
 
-    <article class="manual-entry">
+      <article class="overzicht-entry">
+        <h2>kies uit overzicht</h2>
+      </article>
+    {% endcomment %}
+
+    <article class="manual-entry" id="manual-entry">
       <h2>Handmatige invoer</h2>
+
+      <form action="/admin/update-instrument" method="POST" class="admin-update-form">
+        <fieldset class="form-group">
+          <label for="instrument-key"><p>Typ key om het instrument te vinden.</p></label>
+          <legend>Instrument selecteren</legend>
+          <input id="instrument-key" name="key" type="search" list="instrument-keys" placeholder="zoek je instrument op key" autocomplete="off" required>
+          <datalist id="instrument-keys">
+            {% for instrument in instruments %}
+              <option
+                value="{{ instrument.key }}"
+                label="{{ instrument.name | default: instrument.instrument }}"
+              ></option>
+            {% endfor %}
+          </datalist>
+        </fieldset>
+        <fieldset class="form-group">
+          <legend>Status aanpassen</legend>
+
+          <label for="status-select">Nieuwe status</label>
+          <select id="status-select" name="status" required>
+            <option value="">Selecteer een status</option>
+            {% for status in statusOptions %}
+              <option value="{{ status }}">{{ status }}</option>
+            {% endfor %}
+          </select>
+        </fieldset>
+
+        <button type="submit" class="btn btn-primary">Status bijwerken</button>
+      </form>
     </article>
-
-    <article class="overzicht-entry">
-      <h2>kies uit overzicht</h2>
-    </article>
-
-    <form>
-      <fieldset class="selected-instrument">
-        <legend>Geselecteerd Instrument</legend>
-        <p>Nog geen instrument geselecteerd</p>
-      </fieldset>
-
-      <fieldset class="form-group">
-        <label for="status-select">Nieuwe Status</label>
-        <select id="status-select" name="status" required>
-          <option value="">Selecteer een status</option>
-          {% for status in statusOptions %}
-            <option value="{{ status }}">{{ status }}</option>
-          {% endfor %}
-        </select>
-      </fieldset>
-
-      <button type="submit" class="btn btn-primary">Status bijwerken</button>
-    </form>
 
     <output id="manual-result" class="result-message" style="display: none;"></output>
 

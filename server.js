@@ -159,6 +159,44 @@ app.get('/admin/panel', checkAdminAuth, async function (request, response) {
   });
 });
 
+app.post('/admin/update-instrument', checkAdminAuth, async function (request, response) {
+  const { key, status } = request.body;
+  
+  if (!key || !status) {
+    return response.json({ success: false, message: 'Key en status zijn verplicht' });
+  }
+
+  try {
+    // Fetch the instrument to get its ID
+    const instruments = await reqDATA('preludefonds_instruments', { 'filter[key][_eq]': key });
+    
+    if (!instruments || instruments.length === 0) {
+      return response.json({ success: false, message: 'Instrument niet gevonden' });
+    }
+
+    const instrumentId = instruments[0].id;
+
+    // Update the instrument status in Directus
+    const updateUrl = `https://fdnd-agency.directus.app/items/preludefonds_instruments/${instrumentId}`;
+    const updateResponse = await fetch(updateUrl, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status: status })
+    });
+
+    if (!updateResponse.ok) {
+      return response.json({ success: false, message: 'Fout bij update naar database' });
+    }
+
+    response.json({ success: true, message: `Status gewijzigd naar: ${status}` });
+  } catch (error) {
+    console.error('Error updating instrument:', error);
+    response.json({ success: false, message: 'Server fout' });
+  }
+});
+
 app.use(function (request, response) {
   response.status(404).render('404.liquid')
 })
