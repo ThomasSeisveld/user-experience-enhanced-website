@@ -134,6 +134,16 @@ app.post('/admin/login', function (request, response) {
   }
 });
 
+function checkAdminAuth(request, response, next) {
+  const sessionId = request.headers.cookie?.split('sessionId=')[1]?.split(';')[0];
+  if (sessionId && sessions.has(sessionId) && sessions.get(sessionId).adminAuthenticated) {
+    next();
+  } else {
+    response.redirect(303, '/admin/login');
+  }
+}
+
+
 app.use(function (request, response) {
   response.status(404).render('404.liquid')
 })
