@@ -1,0 +1,65 @@
+{% render 'partials/head.liquid', title: title, menuClass: menuClass %}
+<main>
+  <header class="admin-header">
+    <h1>Instrument Management Panel</h1>
+    <p class="panel-subtitle">Scan QR-codes of kies een instrument om hem te beheren</p>
+    <ul class="nav-list">
+      <li class="{% if action == 'qr-code' %}active{% endif %}">
+        <a href="/admin">qr-code</a>
+      </li>
+      <li class="{% if action == 'handmatig' %}active{% endif %}">
+        <a href="/admin">Handmatig</a>
+      </li>
+      <li class="{% if action == 'overzicht' %}active{% endif %}">
+        <a href="/admin">Overzicht</a>
+      </li>
+    </ul>
+  </header>
+
+  <section class="admin-content">
+    <article class="scanner-entry">
+      <h2>QR-code Scanner</h2>
+    </article>
+
+    <article class="manual-entry">
+      <h2>Handmatige invoer</h2>
+    </article>
+
+    <article class="overzicht-entry">
+      <h2>kies uit overzicht</h2>
+    </article>
+
+    <form>
+      <fieldset class="selected-instrument">
+        <legend>Geselecteerd Instrument</legend>
+        <p>Nog geen instrument geselecteerd</p>
+      </fieldset>
+
+      <fieldset class="form-group">
+        <label for="status-select">Nieuwe Status</label>
+        <select id="status-select" name="status" required>
+          <option value="">Selecteer een status</option>
+          {% for status in statusOptions %}
+            <option value="{{ status }}">{{ status }}</option>
+          {% endfor %}
+        </select>
+      </fieldset>
+
+      <button type="submit" class="btn btn-primary">Status bijwerken</button>
+    </form>
+
+    <output id="manual-result" class="result-message" style="display: none;"></output>
+
+    <section class="recent-actions">
+      <h2>Recente Acties</h2>
+      <article id="actions-log" class="actions-log">
+        <p class="empty-log">Nog geen acties uitgevoerd</p>
+      </article>
+    </section>
+
+    <footer class="admin-footer">
+      <a href="/" class="btn btn-secondary">Terug naar home</a>
+    </footer>
+  </section>
+</main>
+{% render 'partials/foot.liquid' %}
