@@ -92,14 +92,19 @@ app.get('/instruments', async function (request, response) {
   });
 });
 
-app.get('/instruments/new', async function (request, response) {
-  response.render('toevoegen.liquid', { menuClass: 'add', title: 'Instrument toevoegen' });
-});
+// app.get('/instruments/new', async function (request, response) {
+//   response.render('toevoegen.liquid', { menuClass: 'add', title: 'Instrument toevoegen' });
+// });
 
 app.get('/instruments/:key', async function (request, response) {
   const instruments = await reqDATA('preludefonds_instruments', { 'filter[key][_eq]': request.params.key });
   const instrument = instruments[0];
   response.render('informatie.liquid',  { instrument, menuClass: 'overzicht' });
+});
+
+// admin routes 
+app.get('/admin/login', function (request, response) {
+  response.render('admin-login.liquid', { title: 'Admin Login', menuClass: 'portal' });
 });
 
 app.post('/', async function (request, response) {
