@@ -1,0 +1,23 @@
+{% render 'partials/head.liquid', title: title, menuClass: menuClass %}
+<main>
+  <article class="form-container">
+    <h1>Docentenportal - Inloggen</h1>
+    <p class="intro-text">Scanned instrumenten via QR-code om uit te lenen of in te nemen</p>
+    
+    <form action="/admin/login" method="POST" class="admin-login-form">
+      <fieldset>
+        <legend>Authenticatie</legend>
+        
+        <label for="password">Wachtwoord</label>
+        <input type="password" id="password" name="password" placeholder="Voer het wachtwoord in" required autofocus>
+        
+      </fieldset>
+      
+      <footer class="form-actions">
+        <a href="/" class="btn btn-secondary">Terug</a>
+        <button type="submit" class="btn btn-primary">Inloggen</button>
+      </footer>
+    </form>
+  </article>
+</main>
+{% render 'partials/foot.liquid' %}
