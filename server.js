@@ -143,6 +143,17 @@ function checkAdminAuth(request, response, next) {
   }
 }
 
+app.get('/admin/panel', checkAdminAuth, async function (request, response) {
+  const allInstruments = await reqDATA('preludefonds_instruments');
+  const statusOptions = ['Beschikbaar', 'Uitgeleend', 'Beschadigd', 'Onder onderhoud'];
+  
+  response.render('admin-panel.liquid', { 
+    title: 'Instrument Management Panel',
+    menuClass: 'portal',
+    instruments: allInstruments,
+    statusOptions: statusOptions
+  });
+});
 
 app.use(function (request, response) {
   response.status(404).render('404.liquid')
