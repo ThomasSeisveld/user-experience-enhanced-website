@@ -17,6 +17,13 @@
         <a href="/" class="btn btn-secondary">Terug</a>
         <button type="submit" class="btn btn-primary">Inloggen</button>
       </footer>
+      
+    {% if error %}
+      <div class="error-message">
+        <strong>Fout:</strong> {{ error }}
+      </div>
+    {% endif %}
+    
     </form>
   </article>
 </main>
