@@ -1,9 +1,11 @@
 // Importeer het npm package Express (uit de door npm aangemaakte node_modules map)
 // Deze package is geïnstalleerd via `npm install`, en staat als 'dependency' in package.json
 import express from 'express'
+import dotenv from 'dotenv'
 
 // Importeer de Liquid package (ook als dependency via npm geïnstalleerd)
 import { Liquid } from 'liquidjs';
+dotenv.config();
 
 // Doe een fetch naar de data die je nodig hebt
 // const apiResponse = await fetch('...')
@@ -16,6 +18,8 @@ import { Liquid } from 'liquidjs';
 // console.log(apiResponseJSON)
 
 const app = express()
+
+const sessions = new Map();
 
 app.use(express.urlencoded({extended: true}))
 app.use(express.static('public'))
