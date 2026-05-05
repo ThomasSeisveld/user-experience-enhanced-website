@@ -172,7 +172,7 @@ app.post('/admin/update-instrument', checkAdminAuth, async function (request, re
   const { key, status } = request.body;
   
   if (!key || !status) {
-    return response.json({ success: false, message: 'Key en status zijn verplicht' });
+    return response.status(400).json({ success: false, message: 'Key en status zijn verplicht' });
   }
 
   try {
@@ -180,7 +180,7 @@ app.post('/admin/update-instrument', checkAdminAuth, async function (request, re
     const instruments = await reqDATA('preludefonds_instruments', { 'filter[key][_eq]': key });
     
     if (!instruments || instruments.length === 0) {
-      return response.json({ success: false, message: 'Instrument niet gevonden' });
+      return response.status(404).json({ success: false, message: 'Instrument niet gevonden' });
     }
 
     const instrumentId = instruments[0].id;
@@ -196,13 +196,14 @@ app.post('/admin/update-instrument', checkAdminAuth, async function (request, re
     });
 
     if (!updateResponse.ok) {
-      return response.json({ success: false, message: 'Fout bij update naar database' });
+      return response.status(500).json({ success: false, message: 'Fout bij update naar database' });
     }
 
-    response.json({ success: true, message: `Status gewijzigd naar: ${status}` });
+    // Redirect back to admin panel with the selected instrument
+    response.redirect(303, `/admin/panel?instrument=${encodeURIComponent(key)}`);
   } catch (error) {
     console.error('Error updating instrument:', error);
-    response.json({ success: false, message: 'Server fout' });
+    response.status(500).json({ success: false, message: 'Server fout' });
   }
 });
 
