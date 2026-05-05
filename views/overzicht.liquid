@@ -10,7 +10,9 @@
           <th>Naam</th>
           <th>
             <details class="table-filter">
-              <summary>Instrument{% if currentInstrument != '' %}: {{ currentInstrument }}{% endif %}</summary>
+              <summary>
+                Instrument{% if currentInstrument != '' %}: {{ currentInstrument }}{% endif %}
+              </summary>
               <ul class="table-filter-menu">
                 <li class="table-filter-item">
                   <a href="/instruments?{% if currentStatus != '' %}status={{ currentStatus | url_encode }}&{% endif %}limit={{ currentLimit | default: '10' }}">
@@ -29,7 +31,9 @@
           </th>
           <th>
             <details class="table-filter">
-              <summary>Status{% if currentStatus != '' %}: {{ currentStatus }}{% endif %}</summary>
+              <summary>
+                Status{% if currentStatus != '' %}: {{ currentStatus }}{% endif %}
+              </summary>
               <ul class="table-filter-menu">
                 <li class="table-filter-item">
                   <a href="/instruments?{% if currentInstrument != '' %}instrument={{ currentInstrument | url_encode }}&{% endif %}limit={{ currentLimit | default: '10' }}">
@@ -75,7 +79,10 @@
 
     {% if hasMore %}
       <footer class="load-more">
-        <a href="/instruments?limit=all{% if currentInstrument != '' %}&instrument={{ currentInstrument | url_encode }}{% endif %}{% if currentStatus != '' %}&status={{ currentStatus | url_encode }}{% endif %}" class="btn btn-secondary">
+        <a
+          href="/instruments?limit=all{% if currentInstrument != '' %}&instrument={{ currentInstrument | url_encode }}{% endif %}{% if currentStatus != '' %}&status={{ currentStatus | url_encode }}{% endif %}"
+          class="btn btn-secondary"
+        >
           Laat alles zien ({{ totalCount }} instrumenten)
         </a>
       </footer>
