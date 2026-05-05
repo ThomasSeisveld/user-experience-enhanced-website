@@ -151,11 +151,20 @@ app.get('/admin/panel', checkAdminAuth, async function (request, response) {
   const allInstruments = await reqDATA('preludefonds_instruments');
   const statusOptions = ['Beschikbaar', 'Uitgeleend', 'Beschadigd', 'Onder onderhoud'];
   
+  // Check if instrument key is in query parameter
+  let selectedInstrument = null;
+  const instrumentKey = request.query.instrument;
+  
+  if (instrumentKey) {
+    selectedInstrument = allInstruments.find(inst => inst.key === instrumentKey);
+  }
+  
   response.render('admin-panel.liquid', { 
     title: 'Instrument Management Panel',
     menuClass: 'portal',
     instruments: allInstruments,
-    statusOptions: statusOptions
+    statusOptions: statusOptions,
+    selectedInstrument: selectedInstrument
   });
 });
 
