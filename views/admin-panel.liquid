@@ -5,13 +5,13 @@
     <p class="panel-subtitle">Scan QR-codes of kies een instrument om hem te beheren</p>
     <ul class="nav-list">
       <li class="{% if action == 'qr-code' %}active{% endif %}">
-        <a href="/admin">qr-code</a>
+        {% comment %} <a href="/admin">qr-code</a> {% endcomment %}
       </li>
       <li class="{% if action == 'handmatig' %}active{% endif %}">
-        <a href="/admin">Handmatig</a>
+        {% comment %} <a href="/admin">Handmatig</a> {% endcomment %}
       </li>
       <li class="{% if action == 'overzicht' %}active{% endif %}">
-        <a href="/admin">Overzicht</a>
+        {% comment %} <a href="/admin">Overzicht</a> {% endcomment %}
       </li>
     </ul>
   </header>
@@ -28,13 +28,46 @@
     {% endcomment %}
 
     <article class="manual-entry" id="manual-entry">
-      <h2>Handmatige invoer</h2>
+      {% if selectedInstrument %}
+      <section class="selected-instrument">
+        <p class="selected-instrument__label">Geselecteerd instrument</p>
+        <figure class="selected-instrument__figure">
+          {% if selectedInstrument.photo %}
+            <img
+              src="https://fdnd-agency.directus.app/assets/{{ selectedInstrument.photo }}"
+              alt="{{ selectedInstrument.name }}"
+              class="selected-instrument__image"
+            >
+          {% endif %}
+
+          <figcaption class="selected-instrument__caption">
+            <h3 class="selected-instrument__name">
+              {{ selectedInstrument.name | default: selectedInstrument.instrument }}
+            </h3>
+            <span class="status status-{{ selectedInstrument.status | downcase | replace: ' ', '-' | default: 'onbekend' }}">
+              {{ selectedInstrument.status | default: 'onbekend' }}
+            </span>
+          </figcaption>
+        </figure>
+      </section>
+      {% else %}
+        <legend>Selecteer een instrument:</legend>
+      {% endif %}
 
       <form action="/admin/update-instrument" method="POST" class="admin-update-form">
         <fieldset class="form-group">
-          <label for="instrument-key"><p>Typ key om het instrument te vinden.</p></label>
-          <legend>Instrument selecteren</legend>
-          <input id="instrument-key" name="key" type="search" list="instrument-keys" placeholder="zoek je instrument op key" autocomplete="off" required>
+          <input
+            id="instrument-key"
+            name="key"
+            type="search"
+            list="instrument-keys"
+            placeholder="zoek je instrument op key"
+            autocomplete="off"
+            {% if selectedInstrument %}
+              value="{{ selectedInstrument.key }}"
+            {% endif %}
+            required
+          >
           <datalist id="instrument-keys">
             {% for instrument in instruments %}
               <option
@@ -51,7 +84,14 @@
           <select id="status-select" name="status" required>
             <option value="">Selecteer een status</option>
             {% for status in statusOptions %}
-              <option value="{{ status }}">{{ status }}</option>
+              <option
+                value="{{ status }}"
+                {% if selectedInstrument and selectedInstrument.status == status %}
+                  selected
+                {% endif %}
+              >
+                {{ status }}
+              </option>
             {% endfor %}
           </select>
         </fieldset>
@@ -59,19 +99,29 @@
         <button type="submit" class="btn btn-primary">Status bijwerken</button>
       </form>
     </article>
-
     <output id="manual-result" class="result-message" style="display: none;"></output>
-{% comment %} 
-    <section class="recent-actions">
-      <h2>Recente Acties</h2>
-      <article id="actions-log" class="actions-log">
-        <p class="empty-log">Nog geen acties uitgevoerd</p>
-      </article>
-    </section> {% endcomment %}
+    {% comment %}
+      <section class="recent-actions">
+        <h2>Recente Acties</h2>
+        <article id="actions-log" class="actions-log">
+          <p class="empty-log">Nog geen acties uitgevoerd</p>
+        </article>
+      </section>
+    {% endcomment %}
 
     <footer class="admin-footer">
       <a href="/" class="btn btn-secondary">Terug naar home</a>
     </footer>
   </section>
 </main>
+<script>
+      const inputElement = document.getElementById('instrument-key');
+
+      inputElement.addEventListener('change', () => {
+        const key = inputElement.value;
+        if (key) {
+          window.location.href = `/admin/panel?instrument=${encodeURIComponent(key)}`;
+        }
+      });
+</script>
 {% render 'partials/foot.liquid' %}
