@@ -92,7 +92,6 @@ app.post('/admin/login', async function (request, response) {
   if (password === correctPassword) {
     const sessionId = Math.random().toString(36).substring(2, 15);
     sessions.set(sessionId, { adminAuthenticated: true, createdAt: Date.now() });
-    // Set session and cookies
     response.setHeader('Set-Cookie', `sessionId=${sessionId}; Max-Age=3600; Path=/; HttpOnly`);
     response.redirect(303, '/admin/panel');
   } else {
@@ -116,8 +115,6 @@ function checkAdminAuth(request, response, next) {
 app.get('/admin/panel', checkAdminAuth, async function (request, response) {
   const allInstruments = await reqDATA('preludefonds_instruments');
   const statusOptions = ['Beschikbaar', 'Uitgeleend', 'Beschadigd', 'Onder onderhoud'];
-  
-  // Check if instrument key is in query parameter
   let selectedInstrument = null;
   const instrumentKey = request.query.instrument;
   
