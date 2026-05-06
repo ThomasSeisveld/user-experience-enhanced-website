@@ -1,7 +1,21 @@
+// Importeer het npm package Express (uit de door npm aangemaakte node_modules map)
+// Deze package is geïnstalleerd via `npm install`, en staat als 'dependency' in package.json
 import express from 'express'
 import dotenv from 'dotenv'
+
+// Importeer de Liquid package (ook als dependency via npm geïnstalleerd)
 import { Liquid } from 'liquidjs';
 dotenv.config();
+
+// Doe een fetch naar de data die je nodig hebt
+// const apiResponse = await fetch('...')
+
+// Lees van de response van die fetch het JSON object in, waar we iets mee kunnen doen
+// const apiResponseJSON = await apiResponse.json()
+
+// Controleer eventueel de data in je console
+// (Let op: dit is _niet_ de console van je browser, maar van NodeJS, in je terminal)
+// console.log(apiResponseJSON)
 
 const app = express()
 
@@ -21,8 +35,19 @@ async function reqDATA(endpoint, params = {}) {
   const json = await response.json();
   return json.data;
 }
+// data ophalen uit directus en omzetten naar json 
 
+// endpoint                -> de collectie in directus ophalen
+// params                  -> eventuele filters sortering
+// fetch(url)              -> vraagt de data op bij directus via http
+// await response.json()   -> zet om naar json
+// return json.data        -> je krijgt een array van items die in routes gebruikt kunnen worden en naar liquid kan sturen
+
+
+// Routes
 app.get('/', async function (request, response) {
+   // Render index.liquid uit de Views map
+   // Geef hier eventueel data aan mee
   response.render('index.liquid', { title: 'Home', menuClass: 'home' });
 });
 
@@ -31,6 +56,10 @@ app.get('/instruments', async function (request, response) {
   const currentStatus = request.query.status || '';
   const limitParam = request.query.limit || '10';
   const showAll = limitParam === 'all';
+
+  // - ?limit=all  -> alles laten zien
+  // - ?limit=20   -> 20 items laten zien
+  // - geen limit -> 10 items 
   const parsedLimit = Number(limitParam);
   const limit = !showAll && Number.isInteger(parsedLimit) && parsedLimit > 0 ? parsedLimit : 10;
 
@@ -67,17 +96,22 @@ app.get('/instruments', async function (request, response) {
   });
 });
 
+// app.get('/instruments/new', async function (request, response) {
+//   response.render('toevoegen.liquid', { menuClass: 'add', title: 'Instrument toevoegen' });
+// });
+
 app.get('/instruments/:key', async function (request, response) {
   const instruments = await reqDATA('preludefonds_instruments', { 'filter[key][_eq]': request.params.key });
   const instrument = instruments[0];
   response.render('informatie.liquid',  { instrument, menuClass: 'overzicht' });
 });
 
-app.get('/admin/login', async function (request, response) {
+// admin login routes 
+app.get('/admin/login', function (request, response) {
   response.render('admin-login.liquid', { title: 'Admin Login', menuClass: 'portal' });
 });
 
-app.post('/admin/login', async function (request, response) {
+app.post('/admin/login', function (request, response) {
   const password = request.body.password;
   const correctPassword = process.env.TEACHER_PASSWORD;
 
@@ -142,6 +176,7 @@ app.post('/admin/update-instrument', checkAdminAuth, async function (request, re
   }
 
   try {
+    // Fetch the instrument to get its ID
     const instruments = await reqDATA('preludefonds_instruments', { 'filter[key][_eq]': key });
     
     if (!instruments || instruments.length === 0) {
@@ -149,6 +184,8 @@ app.post('/admin/update-instrument', checkAdminAuth, async function (request, re
     }
 
     const instrumentId = instruments[0].id;
+
+    // Update the instrument status in Directus
     const updateUrl = `https://fdnd-agency.directus.app/items/preludefonds_instruments/${instrumentId}`;
     const updateResponse = await fetch(updateUrl, {
       method: 'PATCH',
@@ -162,6 +199,7 @@ app.post('/admin/update-instrument', checkAdminAuth, async function (request, re
       return response.status(500).json({ success: false, message: 'Fout bij update naar database' });
     }
 
+    // Redirect back to admin panel with the selected instrument
     response.redirect(303, `/admin/panel?instrument=${encodeURIComponent(key)}`);
   } catch (error) {
     console.error('Error updating instrument:', error);
@@ -173,8 +211,15 @@ app.use(function (request, response) {
   response.status(404).render('404.liquid')
 })
 
+// Stel het poortnummer in waar Express op moet gaan luisteren
+// Lokaal is dit poort 8000, als dit ergens gehost wordt, is het waarschijnlijk poort 80
 app.set('port', process.env.PORT || 8000)
 
+// Start Express op, haal daarbij het zojuist ingestelde poortnummer op
 app.listen(app.get('port'), function () {
+  // Toon een bericht in de console en geef het poortnummer door
   console.log(`Application started on http://localhost:${app.get('port')}`)
 })
+
+// [_icontains]
+// fields= name, Date
